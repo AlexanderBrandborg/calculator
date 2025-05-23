@@ -25,36 +25,38 @@ func Divide(calculation *model.Calculation, value int) {
 	extend(calculation, "/", value)
 }
 
-func Enter(calculation *model.Calculation) (int, error) {
-	// Because of presedence, we multiply and divide everything first.
-	newList := make([]model.Operation, 0)
-	value := calculation.InitialValue
+func Enter(calculation *model.Calculation) (float64, error) {
+
+	newList := make([]float64, 0)
+	var value float64 = float64(calculation.InitialValue)
+
+	// 5 + 3 = 3
+
+	// Different thought. Just create a list of values we just need to add together
 	for _, v := range calculation.Operations {
 		switch v.Operator {
 		case "+":
-			newList = append(newList, model.Operation{Operator: "+", Val: value})
-			value = v.Val
+			newList = append(newList, value)
+			value = float64(v.Val)
 		case "-":
-			newList = append(newList, model.Operation{Operator: "-", Val: value})
-			value = v.Val
+			newList = append(newList, value)
+			value = float64(-v.Val)
 		case "*":
-			value = value * v.Val
+			value = value * float64(v.Val)
 		case "/":
-			value = value / v.Val
+			value = value / float64(v.Val)
 		default:
 			return 0, errors.New("error: unknown operator in expression")
 		}
 	}
+	// Add the remaining value
+	newList = append(newList, value)
 
 	// Then process addition and subtraction
+	var total float64 = 0
 	for _, v := range newList {
-		switch v.Operator {
-		case "+":
-			value = value + v.Val
-		case "-":
-			value = value - v.Val
-		}
+		total = total + v
 	}
 
-	return value, nil
+	return total, nil
 }

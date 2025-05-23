@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/google/uuid"
 )
@@ -75,7 +74,8 @@ func (router *Router) enterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Errorf("error: could not reduce expression. error='%w'", err).Error(), 500)
 	}
 
-	w.Write([]byte(strconv.Itoa(result)))
+	resultString := fmt.Sprintf("%f", result)
+	w.Write([]byte(resultString))
 }
 
 func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, extendFunc func(*model.Calculation, int)) {
