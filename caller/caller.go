@@ -97,7 +97,7 @@ func (router *Router) enterHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBytes)
 }
 
-func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, extendFunc func(*model.Calculation, int)) {
+func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, extendFunc func(*model.Calculation, int) error) {
 	c := r.Context().Value(calculationKey).(*model.Calculation)
 
 	// Validate body
@@ -110,7 +110,10 @@ func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, 
 	}
 
 	// Update and respond
-	extendFunc(c, opInput.Value)
+	if err := extendFunc(c, opInput.Value); err != nil {
+		http.Error(w, err.Error(), 400)
+	}
+
 	if err := router.store.Create(c); err != nil {
 		http.Error(w, "error: failed to update calculation", 500)
 		return

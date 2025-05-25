@@ -9,20 +9,27 @@ func extend(calculation *model.Calculation, operator string, value int) {
 	calculation.Operations = append(calculation.Operations, model.Operation{Operator: operator, Val: value})
 }
 
-func Add(calculation *model.Calculation, value int) {
+func Add(calculation *model.Calculation, value int) error {
 	extend(calculation, "+", value)
+	return nil
 }
 
-func Subtract(calculation *model.Calculation, value int) {
+func Subtract(calculation *model.Calculation, value int) error  {
 	extend(calculation, "-", value)
+	return nil
 }
 
-func Multiply(calculation *model.Calculation, value int) {
+func Multiply(calculation *model.Calculation, value int) error {
 	extend(calculation, "*", value)
+	return nil
 }
 
-func Divide(calculation *model.Calculation, value int) {
+func Divide(calculation *model.Calculation, value int) error {
+	if value == 0 {
+		return errors.New("error: division by zero is disallowed")
+	}
 	extend(calculation, "/", value)
+	return nil
 }
 
 func Enter(calculation *model.Calculation) (float64, error) {
@@ -30,9 +37,7 @@ func Enter(calculation *model.Calculation) (float64, error) {
 	newList := make([]float64, 0)
 	var value float64 = float64(calculation.InitialValue)
 
-	// 5 + 3 = 3
-
-	// Different thought. Just create a list of values we just need to add together
+	// Evaluate all subexpressions with division and multiplication first
 	for _, v := range calculation.Operations {
 		switch v.Operator {
 		case "+":
@@ -49,7 +54,6 @@ func Enter(calculation *model.Calculation) (float64, error) {
 			return 0, errors.New("error: unknown operator in expression")
 		}
 	}
-	// Add the remaining value
 	newList = append(newList, value)
 
 	// Then process addition and subtraction

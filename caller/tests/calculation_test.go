@@ -64,7 +64,7 @@ func TestSubtractionToNonEmptyOperations(t *testing.T) {
 	}
 }
 
-// MULTIPLY
+// MULTIPLICATION
 func TestMultiplocationToEmptyOperations(t *testing.T) {
 	newCalculation := defaultEmptyCalculation(5)
 	calculation.Multiply(&newCalculation, 5)
@@ -86,7 +86,7 @@ func TestMultiplicationToNonEmptyOperations(t *testing.T) {
 	}
 }
 
-// DIVIDE
+// DIVISION
 func TestDivisionToEmptyOperations(t *testing.T) {
 	newCalculation := defaultEmptyCalculation(5)
 	calculation.Divide(&newCalculation, 5)
@@ -108,7 +108,14 @@ func TestDivisionToNonEmptyOperations(t *testing.T) {
 	}
 }
 
-// MIXED
+func TestDivisionByZero(t *testing.T) {
+	newCalculation := defaultEmptyCalculation(5)
+	if err := calculation.Divide(&newCalculation, 0); err == nil {
+		t.Error()
+	}
+}
+
+// MIXED OPERATIONS
 func TestAllOpsToEmptyOperations(t *testing.T) {
 	newCalculation := defaultEmptyCalculation(5)
 	calculation.Add(&newCalculation, 5)
@@ -137,74 +144,7 @@ func TestAllOpsToNonEmptyOperations(t *testing.T) {
 	}
 }
 
-// CALCULATE
-func TestEnterEmptyOperationsPositiveInitialValue(t *testing.T) {
-	newCalculation := defaultEmptyCalculation(5)
-	result, err := calculation.Enter(&newCalculation)
-	var expectedResult float64 = 5
-
-	if err != nil || result != expectedResult {
-		t.Errorf("Calculation didn't evaluate correctly. Expected %f, but got %f", expectedResult, result)
-	}
-}
-
-func TestEnterEmptyOperationsNegativeInitialValue(t *testing.T) {
-	newCalculation := defaultEmptyCalculation(-5)
-	result, err := calculation.Enter(&newCalculation)
-	var expectedResult float64 = -5
-
-	if err != nil || result != expectedResult {
-		t.Errorf("Calculation didn't evaluate correctly. Expected %f, but got %f", expectedResult, result)
-	}
-}
-
-func TestEnterEmptyOperationsZeroInitialValue(t *testing.T) {
-	newCalculation := defaultEmptyCalculation(0)
-	result, err := calculation.Enter(&newCalculation)
-	var expectedResult float64 = 0
-
-	if err != nil || result != expectedResult {
-		t.Errorf("Calculation didn't evaluate correctly. Expected %f, but got %f", expectedResult, result)
-	}
-}
-
-// CALCULATE - ADD
-func TestEnterAddTwoPositiveValues(t *testing.T) {
-	newCalculation := defaultEmptyCalculation(5)
-	newCalculation.Operations = []model.Operation{{Operator: "+", Val: 5}}
-
-	result, err := calculation.Enter(&newCalculation)
-	var expectedResult float64 = 10
-
-	if err != nil || result != expectedResult {
-		t.Errorf("Calculation didn't evaluate correctly. Expected %f, but got %f", expectedResult, result)
-	}
-}
-
-func TestEnterAddTwoNegativeValues(t *testing.T) {
-	newCalculation := defaultEmptyCalculation(-5)
-	newCalculation.Operations = []model.Operation{{Operator: "+", Val: -5}}
-
-	result, err := calculation.Enter(&newCalculation)
-	var expectedResult float64 = -10
-
-	if err != nil || result != expectedResult {
-		t.Errorf("Calculation didn't evaluate correctly. Expected %f, but got %f", expectedResult, result)
-	}
-}
-
-func TestEnterAddNegativeAndPositiveValues(t *testing.T) {
-	newCalculation := defaultEmptyCalculation(-5)
-	newCalculation.Operations = []model.Operation{{Operator: "+", Val: 5}}
-
-	result, err := calculation.Enter(&newCalculation)
-	var expectedResult float64 = 0
-
-	if err != nil || result != expectedResult {
-		t.Errorf("Calculation didn't evaluate correctly. Expected %f, but got %f", expectedResult, result)
-	}
-}
-
+// EVALUATIONS
 var calculateTests = []struct {
 	name           string
 	calculation    model.Calculation
@@ -240,7 +180,6 @@ var calculateTests = []struct {
 	{"TestMult2Positive&NegativeIntegers", model.Calculation{InitialValue: 5, Operations: []model.Operation{{Operator: "*", Val: -3}}}, -15},
 
 	// Only Division
-	//{"TestDivByZero", model.Calculation{InitialValue: 5, Operations: []model.Operation{{Operator: "/", Val: 0}}}, 1.666666667}, // TODO: Handle divide by zero
 	{"TestDiv2PositiveIntegers", model.Calculation{InitialValue: 5, Operations: []model.Operation{{Operator: "/", Val: 3}}}, 1.666666667},
 	{"TestDiv2NegativeIntegers", model.Calculation{InitialValue: -5, Operations: []model.Operation{{Operator: "/", Val: -3}}}, 1.666666667},
 	{"TestDiv2Negative&PositiveIntegers", model.Calculation{InitialValue: -5, Operations: []model.Operation{{Operator: "/", Val: 3}}}, -1.666666667},
