@@ -259,6 +259,8 @@ var calculateTests = []struct {
 
 	// NOTE: Add some more complicated expressions
 	{"TestComplicatedOneGroupWithpresedence", model.Calculation{InitialValue: 5, Operations: []model.Operation{{Operator: "+", Val: 3}, {Operator: "*", Val: 5}, {Operator: "/", Val: 2}, {Operator: "-", Val: 1}}}, 11.5},
+	{"TestComplicatedOneGroupWithpresedence", model.Calculation{InitialValue: 5, Operations: []model.Operation{{Operator: "+", Val: 3}, {Operator: "*", Val: 5}, {Operator: "/", Val: 2}, {Operator: "-", Val: 1}}}, 11.5},
+
 	{"TestComplicatedTwoGroupWithpresedence", model.Calculation{InitialValue: 5, Operations: []model.Operation{{Operator: "*", Val: 3}, {Operator: "+", Val: 5}, {Operator: "/", Val: 2}, {Operator: "-", Val: 1}}}, 16.5},
 }
 

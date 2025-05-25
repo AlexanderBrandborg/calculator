@@ -22,8 +22,13 @@ type OperationInput struct {
 	Value int `json:"value"`
 }
 
-type Output struct {
+type IdOutput struct {
 	Id string `json:"id"`
+}
+
+type ResultOutput struct {
+	Id     string  `json:"id"`
+	Result float64 `json:"result"`
 }
 
 // ROUTING
@@ -51,14 +56,14 @@ func (router *Router) initHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte(newUuid.String()))
+	jsonBytes, _ := json.Marshal(IdOutput{Id: newUuid.String()})
+	w.Write(jsonBytes)
 }
 
 func (router *Router) enterHandler(w http.ResponseWriter, r *http.Request) {
-	// Should we generalize the error handling here?
 	id := r.PathValue("id")
-	if err := uuid.Validate(id); err != nil {
-		http.Error(w, fmt.Errorf("error: id is not a legal uuid. id='%s'", id).Error(), 400)
+	if err := router.verifyId(r.PathValue("id")); err != nil {
+		http.Error(w, err.Error(), 400)
 		return
 	}
 
@@ -74,19 +79,24 @@ func (router *Router) enterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Errorf("error: could not reduce expression. error='%w'", err).Error(), 500)
 	}
 
-	resultString := fmt.Sprintf("%f", result)
-	w.Write([]byte(resultString))
+	jsonBytes, _ := json.Marshal(ResultOutput{Id: id, Result: result})
+	w.Write(jsonBytes)
+}
+
+func (router *Router) verifyId(id string) error {
+	if err := uuid.Validate(id); err != nil {
+		return fmt.Errorf("error: id is not a legal uuid. id='%s'", id)
+	}
+	return nil
 }
 
 func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, extendFunc func(*model.Calculation, int)) {
 	// Fetch Calculation
 	id := r.PathValue("id")
-	if err := uuid.Validate(id); err != nil {
-		http.Error(w, fmt.Errorf("error: id is not a legal uuid. id='%s'", id).Error(), 400)
-		return
+	if err := router.verifyId(id); err != nil {
+		http.Error(w, err.Error(), 400)
 	}
 
-	// FIX: Both empy calc and empty error?
 	c, fetchError := router.store.GetById(id)
 	if fetchError != nil {
 		http.Error(w, fmt.Errorf("error: id does not match any known calculations. id='%s'", id).Error(), 404) // Pass ID in here
@@ -109,7 +119,8 @@ func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	w.Write([]byte(id))
+	jsonBytes, _ := json.Marshal(IdOutput{Id: id})
+	w.Write(jsonBytes)
 }
 
 func (router *Router) addHandler(w http.ResponseWriter, r *http.Request) {
@@ -140,6 +151,25 @@ func (router *Router) statusHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBytes)
 }
 
+func (router *Router) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if err := router.verifyId(id); err != nil {
+		http.Error(w, err.Error(), 400)
+	}
+
+	c, fetchError := router.store.GetById(id)
+	if fetchError != nil {
+		http.Error(w, fmt.Errorf("error: id does not match any known calculations. id='%s'", id).Error(), 404)
+		return
+	}
+
+	err := router.store.Delete(c)
+	if err != nil {
+		http.Error(w, fmt.Errorf("error: failed to delete calculation. id='%s'", id).Error(), 500)
+		return
+	}
+}
+
 func main() {
 	log.Print("calculator: starting server...")
 
@@ -157,6 +187,7 @@ func main() {
 	http.HandleFunc("PATCH /v1/mult/{id}", router.multiplyHandler)
 	http.HandleFunc("PATCH /v1/div/{id}", router.divideHandler)
 	http.HandleFunc("GET /v1/enter/{id}", router.enterHandler)
+	http.HandleFunc("DELETE /v1/{id}", router.deleteHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
