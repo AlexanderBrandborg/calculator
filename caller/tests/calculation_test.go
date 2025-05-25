@@ -1,8 +1,8 @@
 package calculation
 
 import (
-	"alexander/caller/calculation"
-	"alexander/caller/store"
+	"alexander/main/calculation"
+	"alexander/main/store"
 	"math"
 	"slices"
 	"testing"

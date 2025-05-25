@@ -1,7 +1,7 @@
 package calculation
 
 import (
-	"alexander/caller/store"
+	"alexander/main/store"
 	"errors"
 )
 

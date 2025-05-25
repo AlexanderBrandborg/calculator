@@ -3,8 +3,8 @@ package main
 // NOTE: Deployed version has a fit if you send it a GET with a body. While local version doesn't.
 
 import (
-	"alexander/caller/calculation"
-	"alexander/caller/store"
+	"alexander/main/calculation"
+	"alexander/main/store"
 	"context"
 	"encoding/json"
 	"fmt"

@@ -1,4 +1,4 @@
-module alexander/caller
+module alexander/main
 
 go 1.24.3
 
