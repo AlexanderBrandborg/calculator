@@ -36,7 +36,7 @@ const calculationKey string = "calculation"
 
 // ROUTING
 type Router struct {
-	store *store.Store
+	store store.Store
 }
 
 func (router *Router) idLookupHandlerFunc(handler http.HandlerFunc) http.HandlerFunc {
@@ -162,12 +162,12 @@ func (router *Router) deleteHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	log.Print("calculator: starting server...")
 
-	err := store.FirebaseDB().Connect() // TODO: Hide implementation details of the store
+	store, err := store.FirebaseDB().Connect()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	router := &Router{store: store.NewStore()}
+	router := &Router{store: store}
 
 	http.HandleFunc("POST /v1/init", router.initHandler)
 	http.HandleFunc("GET /v1/{id}", router.idLookupHandlerFunc(router.statusHandler))
