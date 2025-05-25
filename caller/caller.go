@@ -4,7 +4,7 @@ package main
 
 import (
 	"alexander/caller/calculation"
-	"alexander/caller/model"
+	"alexander/caller/store"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -36,7 +36,7 @@ const calculationKey string = "calculation"
 
 // ROUTING
 type Router struct {
-	store *model.Store
+	store *store.Store
 }
 
 func (router *Router) idLookupHandlerFunc(handler http.HandlerFunc) http.HandlerFunc {
@@ -72,7 +72,7 @@ func (router *Router) initHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Add new calculation to database
 	newUuid := uuid.New()
-	newCalculation := model.Calculation{Id: newUuid.String(), InitialValue: initInput.Value, Operations: make([]model.Operation, 0)}
+	newCalculation := store.Calculation{Id: newUuid.String(), InitialValue: initInput.Value, Operations: make([]store.Operation, 0)}
 
 	if err := router.store.Create(&newCalculation); err != nil {
 		http.Error(w, "error: failed to update calculation in database", 500)
@@ -84,7 +84,7 @@ func (router *Router) initHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (router *Router) enterHandler(w http.ResponseWriter, r *http.Request) {
-	c := r.Context().Value(calculationKey).(*model.Calculation)
+	c := r.Context().Value(calculationKey).(*store.Calculation)
 
 	result, err := calculation.Enter(c)
 
@@ -97,8 +97,8 @@ func (router *Router) enterHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBytes)
 }
 
-func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, extendFunc func(*model.Calculation, int) error) {
-	c := r.Context().Value(calculationKey).(*model.Calculation)
+func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, extendFunc func(*store.Calculation, int) error) {
+	c := r.Context().Value(calculationKey).(*store.Calculation)
 
 	// Validate body
 	opInput := OperationInput{}
@@ -140,7 +140,7 @@ func (router *Router) divideHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (router *Router) statusHandler(w http.ResponseWriter, r *http.Request) {
-	c := r.Context().Value(calculationKey).(*model.Calculation)
+	c := r.Context().Value(calculationKey).(*store.Calculation)
 
 	jsonBytes, err := json.Marshal(c)
 	if err != nil {
@@ -151,7 +151,7 @@ func (router *Router) statusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (router *Router) deleteHandler(w http.ResponseWriter, r *http.Request) {
-	c := r.Context().Value(calculationKey).(*model.Calculation)
+	c := r.Context().Value(calculationKey).(*store.Calculation)
 	err := router.store.Delete(c)
 	if err != nil {
 		http.Error(w, fmt.Errorf("error: failed to delete calculation. id='%s'", c.Id).Error(), 500)
@@ -162,12 +162,12 @@ func (router *Router) deleteHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	log.Print("calculator: starting server...")
 
-	err := model.FirebaseDB().Connect()
+	err := store.FirebaseDB().Connect() // TODO: Hide implementation details of the store
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	router := &Router{store: model.NewStore()}
+	router := &Router{store: store.NewStore()}
 
 	http.HandleFunc("POST /v1/init", router.initHandler)
 	http.HandleFunc("GET /v1/{id}", router.idLookupHandlerFunc(router.statusHandler))

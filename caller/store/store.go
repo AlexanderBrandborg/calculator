@@ -1,4 +1,4 @@
-package model
+package store
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 // DATA MODEL
 type Operation struct {
 	Operator string `json:"operator"`
-	Val      int    `json:"val"` // Support floating point
+	Val      int    `json:"val"`
 }
 
 type Calculation struct {
@@ -32,23 +32,21 @@ type FireDB struct {
 var fireDB FireDB
 
 func (db *FireDB) Connect() error {
-	// Find home directory.
-
 	home, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 
 	ctx := context.Background()
-	opt := option.WithCredentialsFile(filepath.Join(home, "calculator-d17e0-firebase-adminsdk-fbsvc-f775f37e36.json")) // NEED TO MAKE THIS WORK IN DOCKER
+	opt := option.WithCredentialsFile(filepath.Join(home, "calculator-d17e0-firebase-adminsdk-fbsvc-f775f37e36.json"))
 	config := &firebase.Config{DatabaseURL: "https://calculator-d17e0-default-rtdb.europe-west1.firebasedatabase.app/"}
 	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
-		return fmt.Errorf("error initializing app: %v", err)
+		return fmt.Errorf("error initializing firebase app: %v", err)
 	}
 	client, err := app.Database(ctx)
 	if err != nil {
-		return fmt.Errorf("error initializing database: %v", err)
+		return fmt.Errorf("error initializing firebase database: %v", err)
 	}
 	db.Client = client
 	return nil
@@ -58,7 +56,6 @@ func FirebaseDB() *FireDB {
 	return &fireDB
 }
 
-// S T O RE
 type Store struct {
 	*FireDB
 }
