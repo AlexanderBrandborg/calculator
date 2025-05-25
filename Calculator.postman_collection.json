@@ -1,0 +1,420 @@
+{
+	"info": {
+		"_postman_id": "0da78f4b-7276-4d84-9bb2-9b59fe6a5279",
+		"name": "Calculator",
+		"description": "Documentation and tests for Calculator service's REST API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15879903"
+	},
+	"item": [
+		{
+			"name": "Initialize Calculation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"pm.environment.set('calculationId', response.id);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns object with Id\", function () {\r",
+							"    pm.expect(response).to.have.property(\"id\");\r",
+							"    pm.expect(response.id).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"value\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/init",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"init"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add +X to calculation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns object with Id\", function () {\r",
+							"    let expectedId = pm.environment.get('calculationId')\r",
+							"    pm.expect(response).to.have.property(\"id\");\r",
+							"    pm.expect(response.id).to.be.a('string');\r",
+							"    pm.expect(response.id).to.equal(expectedId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Value\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/add/{{calculationId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"add",
+						"{{calculationId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add -X to calculation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns object with Id\", function () {\r",
+							"    let expectedId = pm.environment.get('calculationId')\r",
+							"    pm.expect(response).to.have.property(\"id\");\r",
+							"    pm.expect(response.id).to.be.a('string');\r",
+							"    pm.expect(response.id).to.equal(expectedId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Value\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/sub/{{calculationId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"sub",
+						"{{calculationId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add *X to calculation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns object with Id\", function () {\r",
+							"    let expectedId = pm.environment.get('calculationId');\r",
+							"    pm.expect(response).to.have.property(\"id\");\r",
+							"    pm.expect(response.id).to.be.a('string');\r",
+							"    pm.expect(response.id).to.equal(expectedId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Value\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/mult/{{calculationId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"mult",
+						"{{calculationId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add /X to calculation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns object with Id\", function () {\r",
+							"    let expectedId = pm.environment.get('calculationId');\r",
+							"    pm.expect(response).to.have.property(\"id\");\r",
+							"    pm.expect(response.id).to.be.a('string');\r",
+							"    pm.expect(response.id).to.equal(expectedId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Value\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/div/{{calculationId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"div",
+						"{{calculationId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Evaluate Calculation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns object with Id\", function () {\r",
+							"    let expectedId = pm.environment.get('calculationId')\r",
+							"    pm.expect(response).to.have.property(\"id\");\r",
+							"    pm.expect(response.id).to.be.a('string');\r",
+							"    pm.expect(response.id).to.equal(expectedId);\r",
+							"    pm.expect(response.result).to.equal(5)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/v1/enter/{{calculationId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"enter",
+						"{{calculationId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch calculation state",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns object with Id\", function () {\r",
+							"    let expectedId = pm.environment.get('calculationId')\r",
+							"    pm.expect(response).to.have.property(\"id\");\r",
+							"    pm.expect(response.id).to.be.a('string');\r",
+							"    pm.expect(response.id).to.equal(expectedId);\r",
+							"\r",
+							"    let expectedOperations = [{\"operator\":\"+\",\"val\":5},{\"operator\":\"-\",\"val\":5},{\"operator\":\"*\",\"val\":5},{\"operator\":\"/\",\"val\":5}]\r",
+							"    console.log(response.operations)\r",
+							"    console.log(expectedOperations)\r",
+							"    pm.expect(response.operations).to.deep.equal(expectedOperations)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/v1/{{calculationId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"{{calculationId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete calculation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/v1/{{calculationId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"{{calculationId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "default"
+		}
+	]
+}
