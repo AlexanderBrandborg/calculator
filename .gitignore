@@ -97,5 +97,5 @@ go.work.sum
 .env
 
 ## ///// CONFIG /////
-caller/calculator-d17e0-firebase-adminsdk-fbsvc-f775f37e36.json
+main/calculator-d17e0-firebase-adminsdk-fbsvc-f775f37e36.json
 notes
