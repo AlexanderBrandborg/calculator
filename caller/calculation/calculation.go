@@ -24,11 +24,34 @@ func Multiply(calculation *store.Calculation, value int) error {
 	return nil
 }
 
+type DivisionByZeroError struct {
+}
+
+func (e DivisionByZeroError) Error() string {
+	return "division by zero is disallowed"
+}
+
 func Divide(calculation *store.Calculation, value int) error {
 	if value == 0 {
-		return errors.New("error: division by zero is disallowed")
+		return DivisionByZeroError{}
 	}
 	extend(calculation, "/", value)
+	return nil
+}
+
+type UndoError struct {
+}
+
+func (e UndoError) Error() string {
+	return "no operations to undo"
+}
+
+func Undo(calculation *store.Calculation) error {
+	numOperators := len(calculation.Operations)
+	if numOperators == 0 {
+		return UndoError{}
+	}
+	calculation.Operations = calculation.Operations[:numOperators-1]
 	return nil
 }
 

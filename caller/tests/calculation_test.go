@@ -3,6 +3,7 @@ package calculation
 import (
 	"alexander/main/calculation"
 	"alexander/main/store"
+	"errors"
 	"math"
 	"slices"
 	"testing"
@@ -109,7 +110,7 @@ func TestDivisionToNonEmptyOperations(t *testing.T) {
 
 func TestDivisionByZero(t *testing.T) {
 	newCalculation := defaultEmptyCalculation(5)
-	if err := calculation.Divide(&newCalculation, 0); err == nil {
+	if err := calculation.Divide(&newCalculation, 0); !errors.Is(err, calculation.DivisionByZeroError{}) {
 		t.Error()
 	}
 }
@@ -139,6 +140,26 @@ func TestAllOpsToNonEmptyOperations(t *testing.T) {
 
 	expectedOperations := []store.Operation{{Operator: "+", Val: 5}, {Operator: "-", Val: 5}, {Operator: "*", Val: 5}, {Operator: "/", Val: 5}, {Operator: "+", Val: 5}, {Operator: "-", Val: 5}, {Operator: "*", Val: 5}, {Operator: "/", Val: 5}}
 	if newCalculation.InitialValue != 5 || !slices.EqualFunc(newCalculation.Operations, expectedOperations, operatorEqual) {
+		t.Error()
+	}
+}
+
+// UNDO
+func TestUndoEmptyOperations(t *testing.T) {
+	newCalculation := defaultEmptyCalculation(5)
+	if err := calculation.Undo(&newCalculation); !errors.Is(err, calculation.UndoError{}) {
+		t.Error()
+	}
+}
+
+func TestUndoNonEmptyOperations(t *testing.T) {
+	newCalculation := defaultEmptyCalculation(5)
+	newCalculation.Operations = append(newCalculation.Operations, store.Operation{Operator: "+", Val: 5})
+	expectedOperations := []store.Operation{}
+
+	err := calculation.Undo(&newCalculation)
+
+	if err != nil || !slices.EqualFunc(newCalculation.Operations, expectedOperations, operatorEqual) {
 		t.Error()
 	}
 }

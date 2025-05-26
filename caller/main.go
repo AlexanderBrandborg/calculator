@@ -7,6 +7,7 @@ import (
 	"alexander/main/store"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -109,11 +110,16 @@ func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	// Update and respond
+	// Update calculation
 	if err := extendFunc(c, opInput.Value); err != nil {
-		http.Error(w, err.Error(), 400)
+		if (errors.Is(err, calculation.DivisionByZeroError{})) {
+			http.Error(w, fmt.Errorf("error:'%s'. id='%s'", err.Error(), c.Id).Error(), 400)
+		} else {
+			http.Error(w, fmt.Errorf("error: failed to extend calculation. id='%s'", c.Id).Error(), 500)
+		}
 	}
 
+	// Store update
 	if err := router.store.Create(c); err != nil {
 		http.Error(w, "error: failed to update calculation", 500)
 		return
@@ -144,9 +150,32 @@ func (router *Router) statusHandler(w http.ResponseWriter, r *http.Request) {
 
 	jsonBytes, err := json.Marshal(c)
 	if err != nil {
-		fmt.Println("error:", err)
+		http.Error(w, fmt.Errorf("error: failed to unmarshal calculation. id='%s'", c.Id).Error(), 500)
 		return
 	}
+	w.Write(jsonBytes)
+}
+
+func (router *Router) undoHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context().Value(calculationKey).(*store.Calculation)
+
+	// Update calculation
+	if err := calculation.Undo(c); err != nil {
+		if (errors.Is(err, calculation.UndoError{})) {
+			http.Error(w, fmt.Errorf("error:'%s'. id='%s'", err.Error(), c.Id).Error(), 500)
+		} else {
+			http.Error(w, fmt.Errorf("error: failed to perform undo on calculation. id='%s'", c.Id).Error(), 500)
+		}
+		return
+	}
+
+	// Store update
+	if err := router.store.Create(c); err != nil {
+		http.Error(w, "error: failed to update calculation", 500)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(IdOutput{Id: c.Id})
 	w.Write(jsonBytes)
 }
 
@@ -175,6 +204,7 @@ func main() {
 	http.HandleFunc("PATCH /v1/sub/{id}", router.idLookupHandlerFunc(router.subtractHandler))
 	http.HandleFunc("PATCH /v1/mult/{id}", router.idLookupHandlerFunc(router.multiplyHandler))
 	http.HandleFunc("PATCH /v1/div/{id}", router.idLookupHandlerFunc(router.divideHandler))
+	http.HandleFunc("PATCH /v1/undo/{id}", router.idLookupHandlerFunc(router.undoHandler))
 	http.HandleFunc("GET /v1/enter/{id}", router.idLookupHandlerFunc(router.enterHandler))
 	http.HandleFunc("DELETE /v1/{id}", router.idLookupHandlerFunc(router.deleteHandler))
 
