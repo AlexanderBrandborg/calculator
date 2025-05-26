@@ -17,11 +17,12 @@ The basic concept of the API is that it let's you build and evaluate arithmetic 
 The design philosophy has been to not let the user create any illegal expressions, meaning they can't create an expressions with a missing operator arguments, ex. '5 +' and they can't divide by zero. The benefit of this is that the expressions are always in a state, where they can be evaulated, which simiplifies the logic on the backend.
 
 The REST API is documented by a postman collection, a JSON export of which can be found at the root this repository at `Calculator.postman_collection.json`.
-To run the collection, you will need to create two variables in your postman environment `baseUrl` and `calculationId`.
+To run the collection, you will need to create two variables in your postman environment `calculationId` and `baseUrl`.
 
-If you wish to run the requests in the collection against your local service set `baseUrl=http://localhost:8080` in your environment.
-If you wish to run the requests in the collection against the currently deployed service set `baseUrl=https://helloworld-676480202164.europe-north1.run.app` in your environment.
 `calculationId` holds the id of the calculation currently being worked on. It is automatically set, when you run the `Initialize Calculation` endpoint.
+
+* If you wish to run the requests in the collection against your local service set `baseUrl=http://localhost:8080` in your environment.
+* If you wish to run the requests in the collection against the currently deployed service set `baseUrl=https://helloworld-676480202164.europe-north1.run.app` in your environment.
 
 ### Future Extensions
 The API is quite simple right now, but could be extended in the following ways given more time:
@@ -32,7 +33,7 @@ The API is quite simple right now, but could be extended in the following ways g
 * Support for changing individual elements in the expression. Should be relativly simple, as the expressions are already build from individual elements in a list, so the user just needs to give the index of the section the want to change.
 
 ## Architecture
-The application itself is currently deployed in firebase.
+The application itself is currently deployed in firebase at: https://helloworld-676480202164.europe-north1.run.app.
 The architecture for the whole setup is showcased in the following:
 
 ![Uden titel](https://github.com/user-attachments/assets/06702f09-3e5c-4d73-bf1a-535de0f8d44f)
