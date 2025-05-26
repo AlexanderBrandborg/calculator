@@ -1,7 +1,5 @@
 package main
 
-// NOTE: Deployed version has a fit if you send it a GET with a body. While local version doesn't.
-
 import (
 	"alexander/main/calculation"
 	"alexander/main/store"
@@ -90,7 +88,7 @@ func (router *Router) enterHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := calculation.Enter(c)
 
 	if err != nil {
-		http.Error(w, fmt.Errorf("error: could not reduce expression. error='%w'", err).Error(), 500)
+		http.Error(w, fmt.Errorf("error: could not reduce expression. id='%s'", c.Id).Error(), 500)
 		return
 	}
 
@@ -106,7 +104,7 @@ func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, 
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&opInput); err != nil {
-		http.Error(w, fmt.Errorf("error: body could not be unmarshalled. error='%w'", err).Error(), 400)
+		http.Error(w, fmt.Errorf("error: body could not be unmarshalled. id='%s' error='%w'", c.Id, err).Error(), 400)
 		return
 	}
 
@@ -121,7 +119,7 @@ func (router *Router) extendCalculation(w http.ResponseWriter, r *http.Request, 
 
 	// Store update
 	if err := router.store.Create(c); err != nil {
-		http.Error(w, "error: failed to update calculation", 500)
+		http.Error(w, fmt.Errorf("error: failed to update calculation,. id='%s'", c.Id).Error(), 500)
 		return
 	}
 
@@ -171,7 +169,7 @@ func (router *Router) undoHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Store update
 	if err := router.store.Create(c); err != nil {
-		http.Error(w, "error: failed to update calculation", 500)
+		http.Error(w, fmt.Errorf("error: failed to update calculation. id='%s'", c.Id).Error(), 500)
 		return
 	}
 
